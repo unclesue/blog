@@ -23,8 +23,8 @@ class IndexController extends Controller
         return view('admin.home');
     }
 
-    public function index2()
+    public function menu()
     {
-        echo 2;die;
+        return view('admin.menu');
     }
 }

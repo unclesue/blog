@@ -228,14 +228,17 @@ desired effect
                 <li class="active"><a href="#"><i class="fa fa-link"></i> <span>Link</span></a></li>
                 <li><a href="#"><i class="fa fa-link"></i> <span>Another Link</span></a></li>
                 <li class="treeview">
-                    <a href="#"><i class="fa fa-link"></i> <span>Multilevel</span>
+                    <a href="#"><i class="fa fa-tasks"></i> <span>Admin</span>
                         <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
               </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><a href="#">Link in level 2</a></li>
-                        <li><a href="#">Link in level 2</a></li>
+                        <li><a href="/admin/auth/users"><i class="fa fa-users"></i>Users</a></li>
+                        <li><a href="/admin/auth/roles"><i class="fa fa-user"></i>Roles</a></li>
+                        <li><a href="/admin/auth/permissions"><i class="fa fa-ban"></i>Permission</a></li>
+                        <li><a href="/admin/auth/menu"><i class="fa fa-bars"></i>Menu</a></li>
+                        <li><a href="/admin/auth/logs"><i class="fa fa-history"></i>Operation log</a></li>
                     </ul>
                 </li>
             </ul>
