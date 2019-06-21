@@ -59,7 +59,7 @@
                             <label for="parent_id" class="col-sm-2 control-label">Parent</label>
                             <div class="col-sm-10">
                                 <input type="hidden" name="parent_id">
-                                <select class="form-control select2">
+                                <select class="form-control parent_id">
                                     <option selected="selected">Root</option>
                                     <option>Alaska</option>
                                     <option disabled="disabled">California (disabled)</option>
@@ -71,23 +71,24 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="title" class="col-sm-2 control-label">Title</label>
+                            <label for="title" class="col-sm-2 asterisk control-label">Title</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                    <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
                                     <input type="text" id="title" class="form-control" placeholder="Input Title">
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox"> Remember me
-                                    </label>
+                            <label for="icon" class="col-sm-2 asterisk control-label">Icon</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-bars"></i></span>
+                                    <input type="text" name="icon" id="title" class="form-control icon" placeholder="Input Title">
                                 </div>
                             </div>
                         </div>
+
                     </div>
                     <!-- /.box-body -->
                     <div class="box-footer">
@@ -106,13 +107,15 @@
 
 @section('header')
     <link rel="stylesheet" href="{{ asset('bower_components/select2/dist/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('fontawesome-iconpicker/dist/css/fontawesome-iconpicker.min.css') }}">
 @stop
 @section('footer')
     <script src="{{ asset('bower_components/select2/dist/js/select2.full.min.js') }}"></script>
+    <script src="{{ asset('fontawesome-iconpicker/dist/js/fontawesome-iconpicker.min.js') }}"></script>
     <script>
         $(function () {
-            //Initialize Select2 Elements
-            $('.select2').select2()
+            $('.parent_id').select2();
+            $('.icon').iconpicker({placement:'bottomLeft'});
         })
     </script>
 @stop
