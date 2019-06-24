@@ -8,37 +8,15 @@
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Quick Example</h3>
-                </div>
-                <!-- /.box-header -->
-                <!-- form start -->
-                <form role="form">
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label for="exampleInputEmail1">Email address</label>
-                            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
-                        </div>
-                        <div class="form-group">
-                            <label for="exampleInputPassword1">Password</label>
-                            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-                        </div>
-                        <div class="form-group">
-                            <label for="exampleInputFile">File input</label>
-                            <input type="file" id="exampleInputFile">
+                </div><!-- /.box-header -->
 
-                            <p class="help-block">Example block-level help text here.</p>
-                        </div>
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox"> Check me out
-                            </label>
-                        </div>
+                <div class="box-body table-responsive no-padding">
+                    <div class="dd" id="{{ $id }}">
+                        <ol class="dd-list">
+                            @each('admin.tree', $tree, 'node')
+                        </ol>
                     </div>
-                    <!-- /.box-body -->
-
-                    <div class="box-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </form>
+                </div><!-- /.box-body -->
             </div>
             <!-- /.box -->
         </div>
@@ -75,7 +53,7 @@
                             <div class="col-sm-10">
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fas fa-pencil-alt"></i></span>
-                                    <input type="text" id="title" class="form-control" placeholder="Input Title">
+                                    <input type="text" id="title" name="title" class="form-control" placeholder="Input Title">
                                 </div>
                             </div>
                         </div>
@@ -83,17 +61,55 @@
                             <label for="icon" class="col-sm-2 asterisk control-label">Icon</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
-                                    <span class="input-group-addon"><i class="fas fa-bars"></i></span>
-                                    <input type="text" name="icon" id="title" class="form-control" placeholder="Input Title">
+                                    <span class="input-group-addon"></span>
+                                    <input type="text" id="icon" name="icon" class="form-control icon" placeholder="Input Title" value="fas fa-bars">
                                 </div>
                             </div>
                         </div>
-
+                        <div class="form-group">
+                            <label for="uri" class="col-sm-2 control-label">URI</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fas fa-pencil-alt"></i></span>
+                                    <input type="text" id="uri" name="uri" class="form-control" placeholder="Input URI">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="roles" class="col-sm-2 control-label">Roles</label>
+                            <div class="col-sm-10">
+                                <input type="hidden" name="roles">
+                                <select class="form-control roles" multiple="multiple" data-placeholder="Roles">
+                                    <option>Alabama</option>
+                                    <option>Alaska</option>
+                                    <option>California</option>
+                                    <option>Delaware</option>
+                                    <option>Tennessee</option>
+                                    <option>Texas</option>
+                                    <option>Washington</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group  ">
+                            <label for="permission" class="col-sm-2  control-label">Permission</label>
+                            <div class="col-sm-10">
+                                <input type="hidden" name="permission"/>
+                                <select class="form-control permission" name="permission" data-value="" >
+                                    <option value=""></option>
+                                    <option value="*" >All permission</option>
+                                    <option value="dashboard" >Dashboard</option>
+                                    <option value="auth.login" >Login</option>
+                                    <option value="auth.setting" >User setting</option>
+                                    <option value="auth.management" >Auth management</option>
+                                </select>
+                            </div>
+                        </div>
+                        @csrf
                     </div>
                     <!-- /.box-body -->
                     <div class="box-footer">
-                        <button type="submit" class="btn btn-default">Cancel</button>
-                        <button type="submit" class="btn btn-info pull-right">Sign in</button>
+                        <button type="reset" class="btn btn-warning">Reset</button>
+                        <button type="submit" class="btn btn-info pull-right">Submit</button>
                     </div>
                     <!-- /.box-footer -->
                 </form>
@@ -114,8 +130,10 @@
     <script src="{{ asset('plugins/fontawesome-iconpicker/dist/js/fontawesome-iconpicker.min.js') }}"></script>
     <script>
         $(function () {
-            $('.parent_id').select2();
-            $('.icon').iconpicker();
+            $(".parent_id").select2({"allowClear": true, "placeholder": {"id": "", "text": "Parent"}});
+            $('.icon').iconpicker({placement: 'bottomLeft'});
+            $(".roles").select2({"allowClear": true, "placeholder": {"id": "", "text": "Roles"}});
+            $(".permission").select2({"allowClear": true, "placeholder": {"id": "", "text": "Permission"}});
         })
     </script>
 @stop
