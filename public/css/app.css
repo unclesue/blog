@@ -2,3 +2,6 @@
     content: " *";
     color: red;
 }
+.main-header .sidebar-toggle:before {
+    content: "";
+}

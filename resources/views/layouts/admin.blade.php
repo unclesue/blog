@@ -37,7 +37,7 @@ desired effect
         <nav class="navbar navbar-static-top" role="navigation">
             <!-- Sidebar toggle button-->
             <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
-                <span class="sr-only">Toggle navigation</span>
+                <i class="fas fa-bars"></i>
             </a>
             <!-- Navbar Right Menu -->
             <div class="navbar-custom-menu">
@@ -46,7 +46,7 @@ desired effect
                     <li class="dropdown messages-menu">
                         <!-- Menu toggle button -->
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <i class="fa fa-envelope-o"></i>
+                            <i class="far fa-envelope"></i>
                             <span class="label label-success">4</span>
                         </a>
                         <ul class="dropdown-menu">
@@ -58,12 +58,12 @@ desired effect
                                         <a href="#">
                                             <div class="pull-left">
                                                 <!-- User Image -->
-                                                <img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                                                <img src="{{ asset('plugins/adminlte/dist/img/user2-160x160.jpg') }}" class="img-circle" alt="User Image">
                                             </div>
                                             <!-- Message title and timestamp -->
                                             <h4>
                                                 Support Team
-                                                <small><i class="fa fa-clock-o"></i> 5 mins</small>
+                                                <small><i class="far fa-clock"></i> 5 mins</small>
                                             </h4>
                                             <!-- The message -->
                                             <p>Why not buy a new awesome theme?</p>
@@ -82,7 +82,7 @@ desired effect
                     <li class="dropdown notifications-menu">
                         <!-- Menu toggle button -->
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <i class="fa fa-bell-o"></i>
+                            <i class="far fa-bell"></i>
                             <span class="label label-warning">10</span>
                         </a>
                         <ul class="dropdown-menu">
@@ -92,7 +92,7 @@ desired effect
                                 <ul class="menu">
                                     <li><!-- start notification -->
                                         <a href="#">
-                                            <i class="fa fa-users text-aqua"></i> 5 new members joined today
+                                            <i class="fas fa-users text-aqua"></i> 5 new members joined today
                                         </a>
                                     </li>
                                     <!-- end notification -->
@@ -105,7 +105,7 @@ desired effect
                     <li class="dropdown tasks-menu">
                         <!-- Menu Toggle Button -->
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <i class="fa fa-flag-o"></i>
+                            <i class="far fa-flag"></i>
                             <span class="label label-danger">9</span>
                         </a>
                         <ul class="dropdown-menu">
@@ -143,14 +143,14 @@ desired effect
                         <!-- Menu Toggle Button -->
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                             <!-- The user image in the navbar-->
-                            <img src="dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+                            <img src="{{ asset('plugins/adminlte/dist/img/user2-160x160.jpg') }}" class="user-image" alt="User Image">
                             <!-- hidden-xs hides the username on small devices so only the image appears. -->
                             <span class="hidden-xs">Alexander Pierce</span>
                         </a>
                         <ul class="dropdown-menu">
                             <!-- The user image in the menu -->
                             <li class="user-header">
-                                <img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                                <img src="{{ asset('plugins/adminlte/dist/img/user2-160x160.jpg') }}" class="img-circle" alt="User Image">
 
                                 <p>
                                     Alexander Pierce - Web Developer
@@ -185,7 +185,7 @@ desired effect
                     </li>
                     <!-- Control Sidebar Toggle Button -->
                     <li>
-                        <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+                        <a href="#" data-toggle="control-sidebar"><i class="fas fa-cogs"></i></a>
                     </li>
                 </ul>
             </div>
@@ -200,12 +200,12 @@ desired effect
             <!-- Sidebar user panel (optional) -->
             <div class="user-panel">
                 <div class="pull-left image">
-                    <img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                    <img src="{{ asset('plugins/adminlte/dist/img/user2-160x160.jpg') }}" class="img-circle" alt="User Image">
                 </div>
                 <div class="pull-left info">
                     <p>Alexander Pierce</p>
                     <!-- Status -->
-                    <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+                    <a href="#"><i class="far fa-circle text-success"></i> Online</a>
                 </div>
             </div>
 

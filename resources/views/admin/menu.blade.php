@@ -74,7 +74,7 @@
                             <label for="title" class="col-sm-2 asterisk control-label">Title</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                                    <span class="input-group-addon"><i class="fas fa-pencil-alt"></i></span>
                                     <input type="text" id="title" class="form-control" placeholder="Input Title">
                                 </div>
                             </div>
@@ -83,8 +83,8 @@
                             <label for="icon" class="col-sm-2 asterisk control-label">Icon</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-bars"></i></span>
-                                    <input type="text" name="icon" id="title" class="form-control icon" placeholder="Input Title">
+                                    <span class="input-group-addon"><i class="fas fa-bars"></i></span>
+                                    <input type="text" name="icon" id="title" class="form-control" placeholder="Input Title">
                                 </div>
                             </div>
                         </div>
@@ -106,16 +106,16 @@
 @stop
 
 @section('header')
-    <link rel="stylesheet" href="{{ asset('bower_components/select2/dist/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('fontawesome-iconpicker/dist/css/fontawesome-iconpicker.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/select2/dist/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/fontawesome-iconpicker/dist/css/fontawesome-iconpicker.min.css') }}">
 @stop
 @section('footer')
-    <script src="{{ asset('bower_components/select2/dist/js/select2.full.min.js') }}"></script>
-    <script src="{{ asset('fontawesome-iconpicker/dist/js/fontawesome-iconpicker.min.js') }}"></script>
+    <script src="{{ asset('plugins/select2/dist/js/select2.full.min.js') }}"></script>
+    <script src="{{ asset('plugins/fontawesome-iconpicker/dist/js/fontawesome-iconpicker.min.js') }}"></script>
     <script>
         $(function () {
             $('.parent_id').select2();
-            $('.icon').iconpicker({placement:'bottomLeft'});
+            $('.icon').iconpicker();
         })
     </script>
 @stop
