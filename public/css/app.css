@@ -1,11 +1,12 @@
+/* GLOBAL STYLES
+-------------------------------------------------- */
 .form-group > label.asterisk:before {
     content: " *";
     color: red;
 }
-.main-header .sidebar-toggle:before {
-    content: "";
-}
 
+/* TREE
+-------------------------------------------------- */
 .dd {
     position: relative;
     display: block;

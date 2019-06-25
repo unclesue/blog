@@ -31,7 +31,7 @@
                 </div>
                 <!-- /.box-header -->
                 <!-- form start -->
-                <form class="form-horizontal">
+                <form class="form-horizontal" action="{{ route('menu.save') }}">
                     <div class="box-body">
                         <div class="form-group">
                             <label for="parent_id" class="col-sm-2 control-label">Parent</label>
@@ -48,29 +48,35 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group @error('title') has-error @enderror">
                             <label for="title" class="col-sm-2 asterisk control-label">Title</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
-                                    <span class="input-group-addon"><i class="fas fa-pencil-alt"></i></span>
-                                    <input type="text" id="title" name="title" class="form-control" placeholder="Input Title">
+                                    <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                                    <input type="text" id="title" name="title" class="form-control" value="{{ old('title') }}" placeholder="Input Title">
                                 </div>
+                                @error('title')
+                                <span class="help-block">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group @error('icon') has-error @enderror">
                             <label for="icon" class="col-sm-2 asterisk control-label">Icon</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
                                     <span class="input-group-addon"></span>
-                                    <input type="text" id="icon" name="icon" class="form-control icon" placeholder="Input Title" value="fas fa-bars">
+                                    <input type="text" id="icon" name="icon" class="form-control icon" placeholder="Input Title">
                                 </div>
+                                @error('icon')
+                                <span class="help-block">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="uri" class="col-sm-2 control-label">URI</label>
                             <div class="col-sm-10">
                                 <div class="input-group">
-                                    <span class="input-group-addon"><i class="fas fa-pencil-alt"></i></span>
+                                    <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
                                     <input type="text" id="uri" name="uri" class="form-control" placeholder="Input URI">
                                 </div>
                             </div>
