@@ -22,4 +22,10 @@ class IndexController extends Controller
     {
         return view('admin.home');
     }
+
+    public function main()
+    {
+        return view('admin.main');
+    }
+
 }

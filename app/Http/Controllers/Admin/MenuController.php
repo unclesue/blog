@@ -28,8 +28,8 @@ class MenuController extends Controller
         $validatedData = $request->validate([
             'title' => 'required|max:15',
             'icon' => 'required',
+            'uri' => 'required',
         ]);
-        print_r($validatedData);die;
     }
 
 }

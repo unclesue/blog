@@ -1,3 +1,6 @@
+@section('header')
+    <link rel="stylesheet" href="{{ asset('plugins/iCheck/square/blue.css') }}">
+@stop
 @include('admin.header')
 
 <body class="hold-transition login-page">
@@ -29,8 +32,15 @@
                 @enderror
             </div>
             <div class="row">
+                <div class="col-xs-8">
+                    <div class="checkbox icheck">
+                        <label>
+                            <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}> Remember Me
+                        </label>
+                    </div>
+                </div>
                 <!-- /.col -->
-                <div class="col-xs-12">
+                <div class="col-xs-4">
                     <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
                 </div>
                 <!-- /.col -->
@@ -42,4 +52,16 @@
 </div>
 <!-- /.login-box -->
 
+@section('footer')
+    <script src="{{ asset('plugins/iCheck/icheck.min.js') }}"></script>
+    <script>
+        $(function () {
+            $('input').iCheck({
+                checkboxClass: 'icheckbox_square-blue',
+                radioClass: 'iradio_square-blue',
+                increaseArea: '20%' /* optional */
+            });
+        });
+    </script>
+@stop
 @include('admin.footer')

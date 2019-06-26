@@ -31,13 +31,14 @@
                 </div>
                 <!-- /.box-header -->
                 <!-- form start -->
-                <form class="form-horizontal" action="{{ route('menu.save') }}">
+                <form class="form-horizontal" action="{{ route('menu.save') }}" method="POST">
+                    @csrf
                     <div class="box-body">
                         <div class="form-group">
                             <label for="parent_id" class="col-sm-2 control-label">Parent</label>
                             <div class="col-sm-10">
                                 <input type="hidden" name="parent_id">
-                                <select class="form-control parent_id">
+                                <select class="form-control" id="parent_id">
                                     <option selected="selected">Root</option>
                                     <option>Alaska</option>
                                     <option disabled="disabled">California (disabled)</option>
@@ -65,7 +66,7 @@
                             <div class="col-sm-10">
                                 <div class="input-group">
                                     <span class="input-group-addon"></span>
-                                    <input type="text" id="icon" name="icon" class="form-control icon" placeholder="Input Title">
+                                    <input type="text" id="icon" name="icon" value="fa-bars" class="form-control" placeholder="Selcet Icon">
                                 </div>
                                 @error('icon')
                                 <span class="help-block">{{ $message }}</span>
@@ -85,7 +86,7 @@
                             <label for="roles" class="col-sm-2 control-label">Roles</label>
                             <div class="col-sm-10">
                                 <input type="hidden" name="roles">
-                                <select class="form-control roles" multiple="multiple" data-placeholder="Roles">
+                                <select class="form-control" id="roles" multiple="multiple" data-placeholder="Roles">
                                     <option>Alabama</option>
                                     <option>Alaska</option>
                                     <option>California</option>
@@ -96,11 +97,11 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group  ">
+                        <div class="form-group">
                             <label for="permission" class="col-sm-2  control-label">Permission</label>
                             <div class="col-sm-10">
                                 <input type="hidden" name="permission"/>
-                                <select class="form-control permission" name="permission" data-value="" >
+                                <select class="form-control" id="permission" name="permission" data-value="" >
                                     <option value=""></option>
                                     <option value="*" >All permission</option>
                                     <option value="dashboard" >Dashboard</option>
@@ -110,7 +111,6 @@
                                 </select>
                             </div>
                         </div>
-                        @csrf
                     </div>
                     <!-- /.box-body -->
                     <div class="box-footer">
@@ -134,12 +134,14 @@
 @section('footer')
     <script src="{{ asset('plugins/select2/dist/js/select2.full.min.js') }}"></script>
     <script src="{{ asset('plugins/fontawesome-iconpicker/dist/js/fontawesome-iconpicker.min.js') }}"></script>
+    <script src="{{ asset('plugins/jquery.serializeJSON/jquery.serializejson.min.js') }}"></script>
+    <script src="{{ asset('js/util.js?t=') . time() }}"></script>
     <script>
         $(function () {
-            $(".parent_id").select2({"allowClear": true, "placeholder": {"id": "", "text": "Parent"}});
-            $('.icon').iconpicker({placement: 'bottomLeft'});
-            $(".roles").select2({"allowClear": true, "placeholder": {"id": "", "text": "Roles"}});
-            $(".permission").select2({"allowClear": true, "placeholder": {"id": "", "text": "Permission"}});
-        })
+            $("#parent_id").select2({"allowClear": true, "placeholder": {"id": "", "text": "Parent"}, "width": "100%"});
+            $('#icon').iconpicker({placement: 'bottomLeft'});
+            $("#roles").select2({"allowClear": true, "placeholder": {"id": "", "text": "Roles"}, "width": "100%"});
+            $("#permission").select2({"allowClear": true, "placeholder": {"id": "", "text": "Permission"}, "width": "100%"});
+        });
     </script>
 @stop
