@@ -9,7 +9,7 @@
     @if(isset($node['children']))
         <ol class="dd-list">
             @foreach($node['children'] as $node)
-                @include('admin.tree', $node)
+                @include('admin.partials.tree', $node)
             @endforeach
         </ol>
     @endif

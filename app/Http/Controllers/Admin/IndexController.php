@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
 
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
-
-class IndexController extends Controller
+class IndexController extends AdminController
 {
 
     public function __construct()
@@ -19,11 +17,6 @@ class IndexController extends Controller
      * 显示后台管理模板首页
      */
     public function index()
-    {
-        return view('admin.home');
-    }
-
-    public function main()
     {
         return view('admin.main');
     }

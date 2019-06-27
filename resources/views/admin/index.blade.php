@@ -18,7 +18,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Ionicons -->
     <link rel="stylesheet" href="{{ asset('plugins/Ionicons/css/ionicons.min.css') }}">
     <!-- Custom style -->
-@yield('header')
+    @yield('header')
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('plugins/adminlte/dist/css/AdminLTE.min.css') }}">
     <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
@@ -26,6 +26,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           apply the skin class to the body tag so the changes take effect. -->
     <link rel="stylesheet" href="{{ asset('plugins/adminlte/dist/css/skins/skin-blue.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css?t=') . time() }}">
+    <link rel="stylesheet" href="{{ asset('plugins/nprogress/nprogress.css') }}">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -37,3 +38,37 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Google Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
+
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+
+    @include('admin.partials.header')
+
+    @include('admin.partials.sidebar')
+
+    <div class="content-wrapper" id="pjax-container">
+        <div id="app">
+            @yield('content')
+        </div>
+    </div>
+
+    @include('admin.partials.footer')
+
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED JS SCRIPTS -->
+<!-- jQuery 3 -->
+<script src="{{ asset('plugins/jquery/dist/jquery.min.js') }}"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="{{ asset('plugins/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+<!-- AdminLTE App -->
+<script src="{{ asset('plugins/adminlte/dist/js/adminlte.min.js') }}"></script>
+<script src="{{ asset('plugins/jquery-pjax/jquery.pjax.js') }}"></script>
+<script src="{{ asset('plugins/nprogress/nprogress.js') }}"></script>
+<script src="{{ asset('js/app.js?t=') . time() }}"></script>
+
+@yield('footer')
+</body>
+</html>
+

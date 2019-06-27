@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Exceptions\AuthenticatesLogout;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
-class LoginController extends Controller
+class LoginController extends AdminController
 {
     /*
     |--------------------------------------------------------------------------

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\AdminController;
 use App\Model\AdminMenu;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
-class MenuController extends Controller
+class MenuController extends AdminController
 {
 
     public function __construct()
@@ -14,13 +14,14 @@ class MenuController extends Controller
         $this->middleware('auth.admin');
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $adminMenu = new AdminMenu();
         $id = $adminMenu->elementId();
         $tree = $adminMenu->toTree();
+        $view = view('admin.menu', compact('tree', 'id'));
 
-        return view('admin.menu', compact('tree', 'id'));
+        return $this->render($view);
     }
 
     public function save(Request $request)
@@ -30,6 +31,21 @@ class MenuController extends Controller
             'icon' => 'required',
             'uri' => 'required',
         ]);
+    }
+
+    /**
+     * 获取渲染内容
+     * @param $view
+     * @return mixed
+     */
+    public function render($view)
+    {
+        if(request()->pjax()) {
+            $sections = $view->renderSections();
+            return $sections['content'];
+        }
+
+        return $view;
     }
 
 }
