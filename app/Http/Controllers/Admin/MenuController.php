@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Controller;
 use App\Model\AdminMenu;
 use Illuminate\Http\Request;
 
-class MenuController extends AdminController
+class MenuController extends Controller
 {
 
     public function __construct()
@@ -19,9 +19,8 @@ class MenuController extends AdminController
         $adminMenu = new AdminMenu();
         $id = $adminMenu->elementId();
         $tree = $adminMenu->toTree();
-        $view = view('admin.menu', compact('tree', 'id'));
 
-        return $this->render($view);
+        return view('admin.menu', compact('tree', 'id'));
     }
 
     public function save(Request $request)

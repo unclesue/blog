@@ -27,6 +27,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="{{ asset('plugins/adminlte/dist/css/skins/skin-blue.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css?t=') . time() }}">
     <link rel="stylesheet" href="{{ asset('plugins/nprogress/nprogress.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/nestable/nestable.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/toastr/build/toastr.min.css') }}">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -57,6 +59,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </div>
 <!-- ./wrapper -->
 
+<script>
+    function LA() {}
+    LA.token = "{{ csrf_token() }}";
+</script>
+
 <!-- REQUIRED JS SCRIPTS -->
 <!-- jQuery 3 -->
 <script src="{{ asset('plugins/jquery/dist/jquery.min.js') }}"></script>
@@ -66,6 +73,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="{{ asset('plugins/adminlte/dist/js/adminlte.min.js') }}"></script>
 <script src="{{ asset('plugins/jquery-pjax/jquery.pjax.js') }}"></script>
 <script src="{{ asset('plugins/nprogress/nprogress.js') }}"></script>
+<script src="{{ asset('plugins/nestable/jquery.nestable.js') }}"></script>
+<script src="{{ asset('plugins/toastr/build/toastr.min.js') }}"></script>
 <script src="{{ asset('js/app.js?t=') . time() }}"></script>
 
 @yield('footer')

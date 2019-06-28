@@ -1,4 +1,4 @@
-@extends('admin.index')
+@extends(Request::instance()->layout)
 
 @section('content')
     <!-- Content Header (Page header) -->
