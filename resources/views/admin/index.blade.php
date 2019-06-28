@@ -17,8 +17,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="{{ asset('plugins/font-awesome/css/font-awesome.min.css') }}">
     <!-- Ionicons -->
     <link rel="stylesheet" href="{{ asset('plugins/Ionicons/css/ionicons.min.css') }}">
-    <!-- Custom style -->
-    @yield('header')
+    <link rel="stylesheet" href="{{ asset('plugins/select2/dist/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/fontawesome-iconpicker/dist/css/fontawesome-iconpicker.min.css') }}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('plugins/adminlte/dist/css/AdminLTE.min.css') }}">
     <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
@@ -65,18 +65,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </script>
 
 <!-- REQUIRED JS SCRIPTS -->
-<!-- jQuery 3 -->
 <script src="{{ asset('plugins/jquery/dist/jquery.min.js') }}"></script>
-<!-- Bootstrap 3.3.7 -->
 <script src="{{ asset('plugins/bootstrap/dist/js/bootstrap.min.js') }}"></script>
-<!-- AdminLTE App -->
 <script src="{{ asset('plugins/adminlte/dist/js/adminlte.min.js') }}"></script>
 <script src="{{ asset('plugins/jquery-pjax/jquery.pjax.js') }}"></script>
 <script src="{{ asset('plugins/nprogress/nprogress.js') }}"></script>
 <script src="{{ asset('plugins/nestable/jquery.nestable.js') }}"></script>
 <script src="{{ asset('plugins/toastr/build/toastr.min.js') }}"></script>
+<script src="{{ asset('plugins/select2/dist/js/select2.full.min.js') }}"></script>
+<script src="{{ asset('plugins/fontawesome-iconpicker/dist/js/fontawesome-iconpicker.min.js') }}"></script>
 <script src="{{ asset('js/app.js?t=') . time() }}"></script>
-
 @yield('footer')
 </body>
 </html>

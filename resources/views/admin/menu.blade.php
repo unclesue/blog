@@ -145,19 +145,14 @@
     <!-- /.row -->
 @stop
 
-@section('header')
-    <link rel="stylesheet" href="{{ asset('plugins/select2/dist/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('plugins/fontawesome-iconpicker/dist/css/fontawesome-iconpicker.min.css') }}">
-@stop
 @section('footer')
-    <script src="{{ asset('plugins/select2/dist/js/select2.full.min.js') }}"></script>
-    <script src="{{ asset('plugins/fontawesome-iconpicker/dist/js/fontawesome-iconpicker.min.js') }}"></script>
     <script>
         $(function () {
             $('#{{ $id }}').nestable({});
 
             $('.tree_branch_delete').click(function () {
                 var id = $(this).data('id');
+                alert(id);
                 swal({
                     title: "Are you sure to delete this item ?",
                     type: "warning",
