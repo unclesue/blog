@@ -25,11 +25,12 @@ class MenuController extends Controller
 
     public function save(Request $request)
     {
-        $validatedData = $request->validate([
+        $this->validate($request, [
             'title' => 'required|max:15',
             'icon' => 'required',
-            'uri' => 'required',
         ]);
+
+        AdminMenu::create($request->all());
     }
 
     /**

@@ -50,7 +50,8 @@
                 </div>
                 <!-- /.box-header -->
                 <!-- form start -->
-                <form class="form-horizontal" action="javascrip:;" id="formTree">
+                <form method="POST" action="{{ route('admin.menu') }}" class="form-horizontal" accept-charset="UTF-8" pjax-container="1">
+                    @csrf
                     <div class="box-body">
                         <div class="form-group">
                             <label for="parent_id" class="col-sm-2 control-label">Parent</label>
@@ -103,8 +104,7 @@
                         <div class="form-group">
                             <label for="roles" class="col-sm-2 control-label">Roles</label>
                             <div class="col-sm-10">
-                                <input type="hidden" name="roles">
-                                <select class="form-control" id="roles" multiple="multiple" data-placeholder="Roles">
+                                <select class="form-control" id="roles" name="roles" multiple="multiple" data-placeholder="Roles">
                                     <option>Alabama</option>
                                     <option>Alaska</option>
                                     <option>California</option>
@@ -118,7 +118,6 @@
                         <div class="form-group">
                             <label for="permission" class="col-sm-2  control-label">Permission</label>
                             <div class="col-sm-10">
-                                <input type="hidden" name="permission"/>
                                 <select class="form-control" id="permission" name="permission" data-value="" >
                                     <option value=""></option>
                                     <option value="*" >All permission</option>

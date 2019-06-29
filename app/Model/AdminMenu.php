@@ -8,6 +8,13 @@ class AdminMenu extends Model
 {
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [/*'parent_id', 'order', */'title', 'icon'/*, 'uri', 'permission'*/];
+
+    /**
      * Format data to tree like array.
      *
      * @return array
