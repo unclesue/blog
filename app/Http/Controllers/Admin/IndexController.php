@@ -8,11 +8,6 @@ use Illuminate\Http\Request;
 class IndexController extends Controller
 {
 
-    public function __construct()
-    {
-        $this->middleware('auth.admin');
-    }
-
     /**
      * 显示后台管理模板首页
      */
