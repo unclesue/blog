@@ -15,6 +15,32 @@ class AdminMenu extends Model
     protected $fillable = [/*'parent_id', 'order', */'title', 'icon'/*, 'uri', 'permission'*/];
 
     /**
+     * 获取适用于请求的验证规则。
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            'title' => 'required|max:15',
+            'icon' => 'required',
+        ];
+    }
+
+    /**
+     * 获取已定义的验证规则的错误消息。
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'title.required' => 'A title is required',
+            'icon.required'  => 'A message is required',
+        ];
+    }
+
+    /**
      * Format data to tree like array.
      *
      * @return array

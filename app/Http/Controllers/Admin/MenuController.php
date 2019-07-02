@@ -20,20 +20,11 @@ class MenuController extends Controller
         return view('admin.menu', compact('tree', 'id'));
     }
 
-    /**
-     * @param Request $request
-     */
-    protected function validateStore(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|max:15',
-            'icon' => 'required',
-        ]);
-    }
-
     public function form()
     {
-        return new AdminMenu;
+        $form = new Form(new AdminMenu);
+
+        return $form;
     }
 
 }
