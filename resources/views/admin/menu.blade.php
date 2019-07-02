@@ -50,7 +50,7 @@
                 </div>
                 <!-- /.box-header -->
                 <!-- form start -->
-                <form method="POST" action="{{ route('admin.menu') }}" class="form-horizontal" accept-charset="UTF-8" pjax-container="1">
+                <form method="POST" action="{{ route('menu.store') }}" class="form-horizontal" accept-charset="UTF-8" pjax-container="1">
                     @csrf
                     <div class="box-body">
                         <div class="form-group">

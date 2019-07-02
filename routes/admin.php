@@ -1,7 +1,4 @@
 <?php
-
-Route::resource('menu', 'Admin\MenuController', ['except' => ['create']]);
-
 Route::middleware(['auth.admin'])->group(function () {
     Route::resource('menu', 'Admin\MenuController', ['except' => ['create']]);
 });

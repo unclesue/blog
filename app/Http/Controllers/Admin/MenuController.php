@@ -20,29 +20,20 @@ class MenuController extends Controller
         return view('admin.menu', compact('tree', 'id'));
     }
 
-    public function save(Request $request)
+    /**
+     * @param Request $request
+     */
+    protected function validateStore(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'title' => 'required|max:15',
             'icon' => 'required',
         ]);
-
-        AdminMenu::create($request->all());
     }
 
-    /**
-     * 获取渲染内容
-     * @param $view
-     * @return mixed
-     */
-    public function render($view)
+    public function form()
     {
-        if(request()->pjax()) {
-            $sections = $view->renderSections();
-            return $sections['content'];
-        }
-
-        return $view;
+        return new AdminMenu;
     }
 
 }
