@@ -56,9 +56,8 @@
                         <div class="form-group">
                             <label for="parent_id" class="col-sm-2 control-label">Parent</label>
                             <div class="col-sm-10">
-                                <input type="hidden" name="parent_id">
-                                <select class="form-control" id="parent_id">
-                                    <option selected="selected">Root</option>
+                                <select class="form-control" id="parent_id" name="parent_id">
+                                    <option value="0" selected="selected">Root</option>
                                     <option>Alaska</option>
                                     <option disabled="disabled">California (disabled)</option>
                                     <option>Delaware</option>
@@ -116,7 +115,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="permission" class="col-sm-2  control-label">Permission</label>
+                            <label for="permission" class="col-sm-2 control-label">Permission</label>
                             <div class="col-sm-10">
                                 <select class="form-control" id="permission" name="permission" data-value="" >
                                     <option value=""></option>

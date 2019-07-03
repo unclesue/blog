@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class AdminMenu extends Model
 {
@@ -19,7 +20,7 @@ class AdminMenu extends Model
      *
      * @return array
      */
-    public function rules()
+    public function validationRules()
     {
         return [
             'title' => 'required|max:15',
@@ -32,12 +33,22 @@ class AdminMenu extends Model
      *
      * @return array
      */
-    public function messages()
+    public function validationMessages()
     {
         return [
             'title.required' => 'A title is required',
             'icon.required'  => 'A message is required',
         ];
+    }
+
+    /**
+     * A Menu belongs to many roles.
+     *
+     * @return BelongsToMany
+     */
+    public function roles() : BelongsToMany
+    {
+        return $this->belongsToMany(AdminRoleMenu::class, 'admin_role_menus', 'menu_id', 'role_id');
     }
 
     /**
