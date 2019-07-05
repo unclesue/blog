@@ -4,16 +4,15 @@ namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class AdminMenu extends Model
 {
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [/*'parent_id', 'order', */'title', 'icon'/*, 'uri', 'permission'*/];
+    public function fields()
+    {
+        return ['title', 'icon'];
+    }
 
     /**
      * 获取适用于请求的验证规则。

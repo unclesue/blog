@@ -10,8 +10,8 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Relations;
 
 class Form
@@ -45,12 +45,9 @@ class Form
     protected $inputs = [];
 
     /**
-     * Ignored saving fields.
-     *
-     * @var array
+     * @var Collection
      */
-    protected $ignored = ['_token', 'layout'];
-
+    protected $fields;
 
     /**
      * Create a new form instance.
@@ -60,31 +57,99 @@ class Form
     public function __construct($model)
     {
         $this->model = $model;
+
+        $this->fields = new Collection();
     }
 
     /**
      * Store a new record.
      */
-    public function store()
+    public function store($data)
     {
-        $data = \request()->all();
+        //$data = \request()->all();
 
         // Handle validation errors.
-        $validator = Validator::make($data, $this->model->validationRules(), $this->model->validationMessages());
+        /*$validator = Validator::make($data, $this->model->validationRules(), $this->model->validationMessages());
         if ($validator->fails()) {
             return back()->withInput()->withErrors($validator);
-        }
+        }*/
 
         $this->prepare($data);
 
         DB::transaction(function () {
-            foreach ($this->updates as $column => $value) {
+            $inserts = $this->prepareInsert($this->updates);
+
+            foreach ($inserts as $column => $value) {
                 $this->model->setAttribute($column, $value);
             }
+
             $this->model->save();
+
+            $this->updateRelation($this->relations);
         });
 
         return $this->redirectAfterStore();
+    }
+
+    /**
+     * @return Model
+     */
+    public function model()
+    {
+        return $this->model;
+    }
+
+    /**
+     * Prepare input data for insert.
+     *
+     * @param $inserts
+     *
+     * @return array
+     */
+    protected function prepareInsert($inserts)
+    {
+        if ($this->isHasOneRelation($inserts)) {
+            $inserts = Arr::dot($inserts);
+        }
+
+        foreach ($inserts as $column => $value) {
+            if (!in_array($column, $this->fields->all())) {
+                unset($inserts[$column]);
+                continue;
+            }
+
+            $inserts[$column] = $value;
+        }
+
+        $prepared = [];
+
+        foreach ($inserts as $key => $value) {
+            Arr::set($prepared, $key, $value);
+        }
+
+        return $prepared;
+    }
+
+    /**
+     * Is input data is has-one relation.
+     *
+     * @param array $inserts
+     *
+     * @return bool
+     */
+    protected function isHasOneRelation($inserts)
+    {
+        $first = current($inserts);
+
+        if (!is_array($first)) {
+            return false;
+        }
+
+        if (is_array(current($first))) {
+            return false;
+        }
+
+        return Arr::isAssoc($first);
     }
 
     /**
@@ -96,7 +161,7 @@ class Form
      */
     protected function prepare($data = [])
     {
-        $this->inputs = array_merge($this->removeIgnoredFields($data), $this->inputs);
+        $this->inputs = $data;
 
         $this->relations = $this->getRelationInputs($this->inputs);
 
@@ -104,17 +169,168 @@ class Form
     }
 
     /**
-     * Remove ignored fields from input.
+     * Update relation data.
      *
-     * @param array $input
+     * @param array $relationsData
+     *
+     * @return void
+     */
+    protected function updateRelation($relationsData)
+    {
+        foreach ($relationsData as $name => $values) {
+            if (!method_exists($this->model, $name)) {
+                continue;
+            }
+
+            $relation = $this->model->$name();
+
+            $prepared = $this->prepareUpdate([$name => $values]);
+
+            switch (true) {
+                case $relation instanceof Relations\BelongsToMany:
+                case $relation instanceof Relations\MorphToMany:
+                    if (isset($prepared[$name])) {
+                        $relation->sync($prepared[$name]);
+                    }
+                    break;
+                case $relation instanceof Relations\HasOne:
+
+                    $related = $this->model->$name;
+
+                    // if related is empty
+                    if (is_null($related)) {
+                        $related = $relation->getRelated();
+                        $qualifiedParentKeyName = $relation->getQualifiedParentKeyName();
+                        $localKey = Arr::last(explode('.', $qualifiedParentKeyName));
+                        $related->{$relation->getForeignKeyName()} = $this->model->{$localKey};
+                    }
+
+                    foreach ($prepared[$name] as $column => $value) {
+                        $related->setAttribute($column, $value);
+                    }
+
+                    $related->save();
+                    break;
+                case $relation instanceof Relations\BelongsTo:
+                case $relation instanceof Relations\MorphTo:
+
+                    $parent = $this->model->$name;
+
+                    // if related is empty
+                    if (is_null($parent)) {
+                        $parent = $relation->getRelated();
+                    }
+
+                    foreach ($prepared[$name] as $column => $value) {
+                        $parent->setAttribute($column, $value);
+                    }
+
+                    $parent->save();
+
+                    // When in creating, associate two models
+                    $foreignKeyMethod = (app()->version() < '5.8.0') ? 'getForeignKey' : 'getForeignKeyName';
+                    if (!$this->model->{$relation->{$foreignKeyMethod}()}) {
+                        $this->model->{$relation->{$foreignKeyMethod}()} = $parent->getKey();
+
+                        $this->model->save();
+                    }
+
+                    break;
+                case $relation instanceof Relations\MorphOne:
+                    $related = $this->model->$name;
+                    if (is_null($related)) {
+                        $related = $relation->make();
+                    }
+                    foreach ($prepared[$name] as $column => $value) {
+                        $related->setAttribute($column, $value);
+                    }
+                    $related->save();
+                    break;
+                case $relation instanceof Relations\HasMany:
+                case $relation instanceof Relations\MorphMany:
+
+                    foreach ($prepared[$name] as $related) {
+                        /** @var Relations\Relation $relation */
+                        $relation = $this->model->$name();
+
+                        $keyName = $relation->getRelated()->getKeyName();
+
+                        $instance = $relation->findOrNew(Arr::get($related, $keyName));
+
+                        if ($related['_remove_'] == 1) {
+                            $instance->delete();
+
+                            continue;
+                        }
+
+                        Arr::forget($related, '_remove_');
+
+                        $instance->fill($related);
+
+                        $instance->save();
+                    }
+
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Prepare input data for update.
+     *
+     * @param array $updates
      *
      * @return array
      */
-    protected function removeIgnoredFields($input)
+    protected function prepareUpdate(array $updates)
     {
-        Arr::forget($input, $this->ignored);
+        $prepared = [];
 
-        return $input;
+        foreach ($this->fields->all() as $field) {
+            $columns = $field;
+
+            // If column not in input array data, then continue.
+            if (!Arr::has($updates, $columns)) {
+                continue;
+            }
+
+            $value = $this->getDataByColumn($updates, $columns);
+
+            if (is_array($columns)) {
+                foreach ($columns as $name => $column) {
+                    Arr::set($prepared, $column, $value[$name]);
+                }
+            } elseif (is_string($columns)) {
+                Arr::set($prepared, $columns, $value);
+            }
+        }
+
+        return $prepared;
+    }
+
+    /**
+     * @param array        $data
+     * @param string|array $columns
+     *
+     * @return array|mixed
+     */
+    protected function getDataByColumn($data, $columns)
+    {
+        if (is_string($columns)) {
+            return Arr::get($data, $columns);
+        }
+
+        if (is_array($columns)) {
+            $value = [];
+            foreach ($columns as $name => $column) {
+                if (!Arr::has($data, $column)) {
+                    continue;
+                }
+                $value[$name] = Arr::get($data, $column);
+            }
+
+            return $value;
+        }
     }
 
     /**
@@ -199,6 +415,24 @@ class Form
         }
 
         return redirect($url);
+    }
+
+    /**
+     * @param string $field
+     */
+    public function pushField($field)
+    {
+        $this->fields->push($field);
+    }
+
+    /**
+     * @param array $fields
+     */
+    public function pushFields($fields)
+    {
+        foreach ($fields as $field) {
+            $this->pushField($field);
+        }
     }
 
 }

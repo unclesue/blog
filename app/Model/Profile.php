@@ -4,7 +4,7 @@ namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AdminRoleMenu extends Model
+class Profile extends Model
 {
-
+    //
 }

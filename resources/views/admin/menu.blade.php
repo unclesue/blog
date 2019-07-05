@@ -103,14 +103,9 @@
                         <div class="form-group">
                             <label for="roles" class="col-sm-2 control-label">Roles</label>
                             <div class="col-sm-10">
-                                <select class="form-control" id="roles" name="roles" multiple="multiple" data-placeholder="Roles">
-                                    <option>Alabama</option>
-                                    <option>Alaska</option>
-                                    <option>California</option>
-                                    <option>Delaware</option>
-                                    <option>Tennessee</option>
-                                    <option>Texas</option>
-                                    <option>Washington</option>
+                                <select class="form-control" id="roles" name="roles[]" multiple="multiple" data-placeholder="Roles">
+                                    <option value="1">Administrator</option>
+                                    <option value="2">版主</option>
                                 </select>
                             </div>
                         </div>
