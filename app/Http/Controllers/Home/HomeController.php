@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Home;
 
-use App\Http\Controllers\Admin\Form;
 use App\Http\Controllers\Controller;
+use App\Http\Form\Form;
 use App\Model\AdminMenu;
 use App\Model\AdminRoleMenu;
 use App\Model\Phone;
 use App\Model\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -31,29 +32,22 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $form = new Form(new Phone);
+        $form->text('user.name')->rules('required|max:10');
+        $form->text('user.email')->rules('required|email');
+        $form->text('user.password')->rules('required|max:12');
+        $form->text('mobile')->rules('required|unique:phones|min:11', ['mobile.min' => '{{id}}email must']);
 
-        // hasOne更新
-        /*$user = User::find(2);
-        $phone = $user->phone;
-        $phone->setAttribute('mobile', '136' . Str::random(8));
-        $phone->save();*/
-
-        /*$phone = Phone::find(4);
-        $user = $phone->user;
-        $user->setAttribute('name', Str::random(8));
-        $user->save();*/
-
-
-        /*$form = new Form(new Phone);
-        $form->model = $form->model()->findOrFail(4);
-        $form->pushFields(['user.name', 'mobile']);
+        $str = Str::random(6);
         $data = [
             'user' => [
-                'name' => '123456' . Str::random(4),
+                'name' => '123',
+                'email' => $str . 'gmail.com',
+                'password' => bcrypt('password'),
             ],
-            'mobile' => '123321000'
+            'mobile' => '1'
         ];
-        $form->store($data);*/
+        $form->update(4, $data);
 
 
         // 添加栏目、权限
@@ -82,14 +76,17 @@ class HomeController extends Controller
         ];
 
         $form->store($data);*/
-    }
 
-    public function form()
-    {
-        $form = new Form(new User);
-        $form->pushFields(['name', 'email', 'password', 'profile.avatar', 'profile.homepage']);
-
-        return $form;
+        /*$form = new Form(new Phone);
+        $form->pushFields(['mobile']);
+        $str = Str::random(6);
+        $data = [
+            'user' => [
+                'name' => $str,
+            ],
+            'mobile' => time()
+        ];
+        $form->update(14, $data);*/
     }
 
 

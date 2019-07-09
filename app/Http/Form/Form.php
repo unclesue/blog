@@ -1,19 +1,23 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2019/7/2
- * Time: 16:15
- */
+namespace App\Http\Form;
 
-namespace App\Http\Controllers\Admin;
-
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Relations;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
 
+/**
+ * Class Form.
+ *
+ * @method Text           text($column)
+ * @method File           file($column)
+ * @method Image          image($column)
+ */
 class Form
 {
     /**
@@ -45,9 +49,21 @@ class Form
     protected $inputs = [];
 
     /**
+     * Available fields.
+     *
+     * @var array
+     */
+    public static $availableFields = [];
+
+    /**
      * @var Collection
      */
     protected $fields;
+
+    /**
+     * @var bool
+     */
+    protected $isSoftDeletes = false;
 
     /**
      * Create a new form instance.
@@ -59,6 +75,10 @@ class Form
         $this->model = $model;
 
         $this->fields = new Collection();
+
+        Form::registerBuiltinFields();
+
+        $this->isSoftDeletes = in_array(SoftDeletes::class, class_uses_deep($this->model));
     }
 
     /**
@@ -92,42 +112,124 @@ class Form
     }
 
     /**
-     * @return Model
+     * Handle update.
+     *
+     * @param int  $id
+     * @param null $data
+     *
+     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|mixed|null|Response
      */
-    public function model()
+    public function update($id, $data = null)
     {
-        return $this->model;
+        $data = ($data) ?: request()->all();
+
+        $builder = $this->model;
+
+        if ($this->isSoftDeletes) {
+            $builder = $builder->withTrashed();
+        }
+
+        $this->model = $builder->with($this->getRelations())->findOrFail($id);
+
+        // Handle validation errors.
+        print_r($this->validationMessages($data));die('1');
+        if ($validationMessages = $this->validationMessages($data)) {
+            return back()->withInput()->withErrors($validationMessages);
+        }
+
+        $this->prepare($data);
+
+        DB::transaction(function () {
+            $updates = $this->prepareUpdate($this->updates);
+
+            foreach ($updates as $column => $value) {
+                $this->model->setAttribute($column, $value);
+            }
+
+            $this->model->save();
+
+            $this->updateRelation($this->relations);
+        });
+
+        return $this->redirectAfterUpdate($id);
     }
 
     /**
-     * Prepare input data for insert.
+     * Get validation messages.
      *
-     * @param $inserts
+     * @param array $input
      *
-     * @return array
+     * @return MessageBag|bool
      */
-    protected function prepareInsert($inserts)
+    public function validationMessages($input)
     {
-        if ($this->isHasOneRelation($inserts)) {
-            $inserts = Arr::dot($inserts);
-        }
+        $failedValidators = [];
 
-        foreach ($inserts as $column => $value) {
-            if (!in_array($column, $this->fields->all())) {
-                unset($inserts[$column]);
+        /** @var Field $field */
+        foreach ($this->fields() as $field) {
+            if (!$validator = $field->getValidator($input)) {
                 continue;
             }
 
-            $inserts[$column] = $value;
+            if (($validator instanceof Validator) && !$validator->passes()) {
+                $failedValidators[] = $validator;
+            }
         }
 
-        $prepared = [];
+        $message = $this->mergeValidationMessages($failedValidators);
 
-        foreach ($inserts as $key => $value) {
-            Arr::set($prepared, $key, $value);
+        return $message->any() ? $message : false;
+    }
+
+    /**
+     * Merge validation messages from input validators.
+     *
+     * @param \Illuminate\Validation\Validator[] $validators
+     *
+     * @return MessageBag
+     */
+    protected function mergeValidationMessages($validators)
+    {
+        $messageBag = new MessageBag();
+
+        foreach ($validators as $validator) {
+            $messageBag = $messageBag->merge($validator->messages());
         }
 
-        return $prepared;
+        return $messageBag;
+    }
+
+    /**
+     * Get all relations of model from callable.
+     *
+     * @return array
+     */
+    public function getRelations()
+    {
+        $relations = $columns = [];
+
+        /** @var Field $field */
+        foreach ($this->fields as $field) {
+            $columns[] = $field->column();
+        }
+
+        foreach (Arr::flatten($columns) as $column) {
+            if (Str::contains($column, '.')) {
+                list($relation) = explode('.', $column);
+
+                if (method_exists($this->model, $relation) &&
+                    $this->model->$relation() instanceof Relations\Relation
+                ) {
+                    $relations[] = $relation;
+                }
+            } elseif (method_exists($this->model, $column) &&
+                !method_exists(Model::class, $column)
+            ) {
+                $relations[] = $column;
+            }
+        }
+
+        return array_unique($relations);
     }
 
     /**
@@ -174,6 +276,8 @@ class Form
      * @param array $relationsData
      *
      * @return void
+     *
+     * @throws \Exception
      */
     protected function updateRelation($relationsData)
     {
@@ -184,7 +288,15 @@ class Form
 
             $relation = $this->model->$name();
 
-            $prepared = $this->prepareUpdate([$name => $values]);
+            $oneToOneRelation = $relation instanceof Relations\HasOne
+                || $relation instanceof Relations\MorphOne
+                || $relation instanceof Relations\BelongsTo;
+
+            $prepared = $this->prepareUpdate([$name => $values], $oneToOneRelation);
+
+            if (empty($prepared)) {
+                continue;
+            }
 
             switch (true) {
                 case $relation instanceof Relations\BelongsToMany:
@@ -279,22 +391,30 @@ class Form
      * Prepare input data for update.
      *
      * @param array $updates
+     * @param bool  $oneToOneRelation If column is one-to-one relation.
      *
      * @return array
      */
-    protected function prepareUpdate(array $updates)
+    protected function prepareUpdate(array $updates, $oneToOneRelation = false)
     {
         $prepared = [];
 
-        foreach ($this->fields->all() as $field) {
-            $columns = $field;
+        /** @var Field $field */
+        foreach ($this->fields() as $field) {
+            $columns = $field->column();
 
             // If column not in input array data, then continue.
             if (!Arr::has($updates, $columns)) {
                 continue;
             }
 
+            if ($this->isInvalidColumn($columns, $oneToOneRelation)) {
+                continue;
+            }
+
             $value = $this->getDataByColumn($updates, $columns);
+
+            $value = $field->prepare($value);
 
             if (is_array($columns)) {
                 foreach ($columns as $name => $column) {
@@ -303,6 +423,55 @@ class Form
             } elseif (is_string($columns)) {
                 Arr::set($prepared, $columns, $value);
             }
+        }
+
+        return $prepared;
+    }
+
+    /**
+     * @param string|array $columns
+     * @param bool         $containsDot
+     *
+     * @return bool
+     */
+    protected function isInvalidColumn($columns, $containsDot = false)
+    {
+        foreach ((array) $columns as $column) {
+            if ((!$containsDot && Str::contains($column, '.')) ||
+                ($containsDot && !Str::contains($column, '.'))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Prepare input data for insert.
+     *
+     * @param $inserts
+     *
+     * @return array
+     */
+    protected function prepareInsert($inserts)
+    {
+        if ($this->isHasOneRelation($inserts)) {
+            $inserts = Arr::dot($inserts);
+        }
+
+        foreach ($inserts as $column => $value) {
+            if (is_null($field = $this->getFieldByColumn($column))) {
+                unset($inserts[$column]);
+                continue;
+            }
+
+            $inserts[$column] = $field->prepare($value);
+        }
+
+        $prepared = [];
+
+        foreach ($inserts as $key => $value) {
+            Arr::set($prepared, $key, $value);
         }
 
         return $prepared;
@@ -331,6 +500,26 @@ class Form
 
             return $value;
         }
+    }
+
+    /**
+     * Find field object by column.
+     *
+     * @param $column
+     *
+     * @return mixed
+     */
+    protected function getFieldByColumn($column)
+    {
+        return $this->fields->first(
+            function (Field $field) use ($column) {
+                if (is_array($field->column())) {
+                    return in_array($column, $field->column());
+                }
+
+                return $field->column() == $column;
+            }
+        );
     }
 
     /**
@@ -392,6 +581,20 @@ class Form
     }
 
     /**
+     * Get RedirectResponse after update.
+     *
+     * @param mixed $key
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function redirectAfterUpdate($key)
+    {
+        $resourcesPath = $this->resource(-1);
+
+        return $this->redirectAfterSaving($resourcesPath, $key);
+    }
+
+    /**
      * Get RedirectResponse after data saving.
      *
      * @param string $resourcesPath
@@ -418,21 +621,75 @@ class Form
     }
 
     /**
-     * @param string $field
+     * Register builtin fields.
+     *
+     * @return void
      */
-    public function pushField($field)
+    public static function registerBuiltinFields()
     {
-        $this->fields->push($field);
+        $map = [
+            'text' => Text::class,
+            'file' => File::class,
+            'image' => Image::class,
+        ];
+
+        foreach ($map as $abstract => $class) {
+            static::$availableFields[$abstract] = $class;
+        }
     }
 
     /**
-     * @param array $fields
+     * @param Field $field
+     *
+     * @return $this
      */
-    public function pushFields($fields)
+    public function pushField(Field $field)
     {
-        foreach ($fields as $field) {
-            $this->pushField($field);
+        $field->setForm($this);
+
+        $this->fields()->push($field);
+
+        return $this;
+    }
+
+    /**
+     * @return Model
+     */
+    public function model()
+    {
+        return $this->model;
+    }
+
+    /**
+     * Get fields of this builder.
+     *
+     * @return Collection
+     */
+    public function fields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * Generate a Field object and add to form builder if Field exists.
+     *
+     * @param string $method
+     * @param array  $arguments
+     *
+     * @return Field
+     */
+    public function __call($method, $arguments)
+    {
+        $class = Arr::get(static::$availableFields, $method);
+        if (class_exists($class)) {
+            $column = Arr::get($arguments, 0, ''); //[0];
+            $element = new $class($column, array_slice($arguments, 1));
+            $this->pushField($element);
+
+            return $element;
         }
+
+        return new Nullable();
     }
 
 }
