@@ -8,6 +8,7 @@
 
 namespace App\Http\Form;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class File extends Field
 {
@@ -35,6 +36,48 @@ class File extends Field
     public function defaultDirectory()
     {
         return 'files';
+    }
+
+    /**
+     * Prepare for saving.
+     *
+     * @param UploadedFile|array $file
+     *
+     * @return mixed|string
+     */
+    public function prepare($file)
+    {
+        if (request()->has(static::FILE_DELETE_FLAG)) {
+            return $this->destroy();
+        }
+
+        $this->name = $this->getStoreName($file);
+
+        return $this->uploadAndDeleteOriginal($file);
+    }
+
+    /**
+     * Upload file and delete original file.
+     *
+     * @param UploadedFile $file
+     *
+     * @return mixed
+     */
+    protected function uploadAndDeleteOriginal(UploadedFile $file)
+    {
+        $this->renameIfExists($file);
+
+        $path = null;
+
+        if (!is_null($this->storagePermission)) {
+            $path = $this->storage->putFileAs($this->getDirectory(), $file, $this->name, $this->storagePermission);
+        } else {
+            $path = $this->storage->putFileAs($this->getDirectory(), $file, $this->name);
+        }
+
+        $this->destroy();
+
+        return $path;
     }
 
 }

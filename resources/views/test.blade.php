@@ -30,10 +30,22 @@
 </head>
 
 <body>
+@if(count($errors)>0)
+    <div class="mark">
+        @if(is_object($errors))
+            @foreach($errors->all() as $error)
+                <p>{{$error}}</p>
+            @endforeach
+        @else
+            <p>{{$errors}}</p>
+        @endif
+    </div>
+@endif
 <form action="/" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data">
     @csrf
 
-    <input id="input-b1" name="input-b1" type="file" class="file" data-browse-on-zone-click="true">
+    <input name="name" type="text">
+    <input id="input-b1" name="profile[avatar]" type="file" class="file" data-browse-on-zone-click="true">
     <button type="submit" class="btn btn-primary">提交</button>
 </form>
 <script>

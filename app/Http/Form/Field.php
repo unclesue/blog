@@ -58,6 +58,13 @@ class Field
      */
     protected $form = null;
 
+    /**
+     * Field original value.
+     *
+     * @var mixed
+     */
+    protected $original;
+
 
     /**
      * Field constructor.
@@ -88,6 +95,18 @@ class Field
     public function prepare($value)
     {
         return $value;
+    }
+
+    /**
+     * Set original value to the field.
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    public function setOriginal($data)
+    {
+        $this->original = Arr::get($data, $this->column);
     }
 
     /**

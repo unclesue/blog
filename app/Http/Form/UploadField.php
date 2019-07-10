@@ -68,6 +68,18 @@ trait UploadField
     }
 
     /**
+     * Indicates if the underlying field is retainable.
+     *
+     * @return $this
+     */
+    public function retainable($retainable = true)
+    {
+        $this->retainable = $retainable;
+
+        return $this;
+    }
+
+    /**
      * Set disk for storage.
      *
      * @param string $disk Disks defined in `config/filesystems.php`.

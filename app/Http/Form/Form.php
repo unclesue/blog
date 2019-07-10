@@ -84,15 +84,14 @@ class Form
     /**
      * Store a new record.
      */
-    public function store($data)
+    public function store()
     {
-        //$data = \request()->all();
+        $data = request()->all();
 
         // Handle validation errors.
-        /*$validator = Validator::make($data, $this->model->validationRules(), $this->model->validationMessages());
-        if ($validator->fails()) {
-            return back()->withInput()->withErrors($validator);
-        }*/
+        if ($validationMessages = $this->validationMessages($data)) {
+            return back()->withInput()->withErrors($validationMessages);
+        }
 
         $this->prepare($data);
 
@@ -132,7 +131,6 @@ class Form
         $this->model = $builder->with($this->getRelations())->findOrFail($id);
 
         // Handle validation errors.
-        print_r($this->validationMessages($data));die('1');
         if ($validationMessages = $this->validationMessages($data)) {
             return back()->withInput()->withErrors($validationMessages);
         }

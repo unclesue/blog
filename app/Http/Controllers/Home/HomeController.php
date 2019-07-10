@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Home;
 
 use App\Http\Controllers\Controller;
 use App\Http\Form\Form;
+use App\Http\Form\Image;
 use App\Model\AdminMenu;
 use App\Model\AdminRoleMenu;
 use App\Model\Phone;
@@ -32,7 +33,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $form = new Form(new Phone);
+        /*$form = new Form(new Phone);
         $form->text('user.name')->rules('required|max:10');
         $form->text('user.email')->rules('required|email');
         $form->text('user.password')->rules('required|max:12');
@@ -47,8 +48,33 @@ class HomeController extends Controller
             ],
             'mobile' => '1'
         ];
-        $form->update(4, $data);
+        $form->update(4, $data);*/
 
+        /*$form = new Form(new User);
+        $form->text('name')->rules('required|max:10');
+        $form->text('email')->rules('required|email');
+        $form->Image('profile.avatar')->rules('required|image');
+        $str = Str::random(6);
+        $data = [
+            'user' => [
+                'name' => $str,
+                'email' => $str . 'gmail.com',
+            ],
+            'profile' => [
+                'avatar' => ''
+            ]
+        ];*/
+
+        if (request()->isMethod('POST')) {
+            $form = new Form(new User);
+            $form->text('name')->rules('required|max:10');
+            //$form->text('email')->rules('required|email');
+            $form->image('profile.avatar')->rules('required');
+
+            $res = $form->update(1);
+        }
+
+        return view('test');
 
         // 添加栏目、权限
         /*$form = new Form(new AdminMenu);
