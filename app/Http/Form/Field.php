@@ -16,6 +16,8 @@ class Field
 {
     use Macroable;
 
+    const FILE_DELETE_FLAG = '_file_del_';
+
     /**
      * Column name.
      *

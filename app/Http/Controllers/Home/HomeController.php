@@ -67,9 +67,10 @@ class HomeController extends Controller
 
         if (request()->isMethod('POST')) {
             $form = new Form(new User);
-            $form->text('name')->rules('required|max:10');
-            //$form->text('email')->rules('required|email');
+            /*$form->text('name')->rules('required|max:10');
+            $form->text('email')->rules('required|email');*/
             $form->image('profile.avatar')->rules('required');
+            $form->text('phone.mobile')->rules('required');
 
             $res = $form->update(1);
         }

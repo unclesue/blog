@@ -45,11 +45,28 @@
     @csrf
 
     <input name="name" type="text">
-    <input id="input-b1" name="profile[avatar]" type="file" class="file" data-browse-on-zone-click="true">
+    <input type="file" class="website_logo" name="profile[avatar]"  />
     <button type="submit" class="btn btn-primary">提交</button>
 </form>
 <script>
-    $("#input-id").fileinput();
+    $("input.website_logo").fileinput({
+        "overwriteInitial": true,
+        "initialPreviewAsData": true,
+        "browseLabel": "\u6d4f\u89c8",
+        "cancelLabel": "\u53d6\u6d88",
+        "showRemove": false,
+        "showUpload": false,
+        "showCancel": false,
+        "dropZoneEnabled": false,
+        "deleteExtraData": {
+            "website_logo": "_file_del_",
+            "_token": "ESHUWtwrN0pIfRYIVkAbS3OWAkVBR2eMWRSpDxpY",
+            "_method": "PUT"
+        },
+        "fileActionSettings": {"showRemove": false, "showDrag": false},
+        "msgPlaceholder": "\u9009\u62e9\u56fe\u7247",
+        "allowedFileTypes": ["image"]
+    });
 </script>
 </body>
 </html>

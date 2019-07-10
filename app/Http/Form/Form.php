@@ -82,6 +82,24 @@ class Form
     }
 
     /**
+     * @return Model
+     */
+    public function model()
+    {
+        return $this->model;
+    }
+
+    /**
+     * Get fields of this builder.
+     *
+     * @return Collection
+     */
+    public function fields()
+    {
+        return $this->fields;
+    }
+
+    /**
      * Store a new record.
      */
     public function store()
@@ -116,7 +134,7 @@ class Form
      * @param int  $id
      * @param null $data
      *
-     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|mixed|null|Response
+     * @return bool|mixed
      */
     public function update($id, $data = null)
     {
@@ -129,6 +147,8 @@ class Form
         }
 
         $this->model = $builder->with($this->getRelations())->findOrFail($id);
+
+        $this->setFieldOriginalValue();
 
         // Handle validation errors.
         if ($validationMessages = $this->validationMessages($data)) {
@@ -180,24 +200,6 @@ class Form
     }
 
     /**
-     * Merge validation messages from input validators.
-     *
-     * @param \Illuminate\Validation\Validator[] $validators
-     *
-     * @return MessageBag
-     */
-    protected function mergeValidationMessages($validators)
-    {
-        $messageBag = new MessageBag();
-
-        foreach ($validators as $validator) {
-            $messageBag = $messageBag->merge($validator->messages());
-        }
-
-        return $messageBag;
-    }
-
-    /**
      * Get all relations of model from callable.
      *
      * @return array
@@ -228,6 +230,74 @@ class Form
         }
 
         return array_unique($relations);
+    }
+
+    /**
+     * Get current resource route url.
+     *
+     * @param int $slice
+     *
+     * @return string
+     */
+    public function resource($slice = -2)
+    {
+        $segments = explode('/', trim(app('request')->getUri(), '/'));
+
+        if ($slice != 0) {
+            $segments = array_slice($segments, 0, $slice);
+        }
+
+        return implode('/', $segments);
+    }
+
+    /**
+     * @param Field $field
+     *
+     * @return $this
+     */
+    public function pushField(Field $field)
+    {
+        $field->setForm($this);
+
+        $this->fields()->push($field);
+
+        return $this;
+    }
+
+    /**
+     * Register builtin fields.
+     *
+     * @return void
+     */
+    public static function registerBuiltinFields()
+    {
+        $map = [
+            'text' => Text::class,
+            'file' => File::class,
+            'image' => Image::class,
+        ];
+
+        foreach ($map as $abstract => $class) {
+            static::$availableFields[$abstract] = $class;
+        }
+    }
+
+    /**
+     * Merge validation messages from input validators.
+     *
+     * @param \Illuminate\Validation\Validator[] $validators
+     *
+     * @return MessageBag
+     */
+    protected function mergeValidationMessages($validators)
+    {
+        $messageBag = new MessageBag();
+
+        foreach ($validators as $validator) {
+            $messageBag = $messageBag->merge($validator->messages());
+        }
+
+        return $messageBag;
     }
 
     /**
@@ -266,6 +336,20 @@ class Form
         $this->relations = $this->getRelationInputs($this->inputs);
 
         $this->updates = Arr::except($this->inputs, array_keys($this->relations));
+    }
+
+    /**
+     * Set original data for each field.
+     *
+     * @return void
+     */
+    protected function setFieldOriginalValue()
+    {
+        $values = $this->model->toArray();
+
+        $this->fields()->each(function (Field $field) use ($values) {
+            $field->setOriginal($values);
+        });
     }
 
     /**
@@ -414,13 +498,7 @@ class Form
 
             $value = $field->prepare($value);
 
-            if (is_array($columns)) {
-                foreach ($columns as $name => $column) {
-                    Arr::set($prepared, $column, $value[$name]);
-                }
-            } elseif (is_string($columns)) {
-                Arr::set($prepared, $columns, $value);
-            }
+            Arr::set($prepared, $columns, $value);
         }
 
         return $prepared;
@@ -483,21 +561,7 @@ class Form
      */
     protected function getDataByColumn($data, $columns)
     {
-        if (is_string($columns)) {
-            return Arr::get($data, $columns);
-        }
-
-        if (is_array($columns)) {
-            $value = [];
-            foreach ($columns as $name => $column) {
-                if (!Arr::has($data, $column)) {
-                    continue;
-                }
-                $value[$name] = Arr::get($data, $column);
-            }
-
-            return $value;
-        }
+        return Arr::get($data, $columns);
     }
 
     /**
@@ -511,10 +575,6 @@ class Form
     {
         return $this->fields->first(
             function (Field $field) use ($column) {
-                if (is_array($field->column())) {
-                    return in_array($column, $field->column());
-                }
-
                 return $field->column() == $column;
             }
         );
@@ -544,24 +604,6 @@ class Form
         }
 
         return $relations;
-    }
-
-    /**
-     * Get current resource route url.
-     *
-     * @param int $slice
-     *
-     * @return string
-     */
-    public function resource($slice = -2)
-    {
-        $segments = explode('/', trim(app('request')->getUri(), '/'));
-
-        if ($slice != 0) {
-            $segments = array_slice($segments, 0, $slice);
-        }
-
-        return implode('/', $segments);
     }
 
     /**
@@ -616,56 +658,6 @@ class Form
         }
 
         return redirect($url);
-    }
-
-    /**
-     * Register builtin fields.
-     *
-     * @return void
-     */
-    public static function registerBuiltinFields()
-    {
-        $map = [
-            'text' => Text::class,
-            'file' => File::class,
-            'image' => Image::class,
-        ];
-
-        foreach ($map as $abstract => $class) {
-            static::$availableFields[$abstract] = $class;
-        }
-    }
-
-    /**
-     * @param Field $field
-     *
-     * @return $this
-     */
-    public function pushField(Field $field)
-    {
-        $field->setForm($this);
-
-        $this->fields()->push($field);
-
-        return $this;
-    }
-
-    /**
-     * @return Model
-     */
-    public function model()
-    {
-        return $this->model;
-    }
-
-    /**
-     * Get fields of this builder.
-     *
-     * @return Collection
-     */
-    public function fields()
-    {
-        return $this->fields;
     }
 
     /**
