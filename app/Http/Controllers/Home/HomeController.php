@@ -33,7 +33,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        /*$form = new Form(new Phone);
+        $form = new Form(new Phone);
         $form->text('user.name')->rules('required|max:10');
         $form->text('user.email')->rules('required|email');
         $form->text('user.password')->rules('required|max:12');
@@ -48,7 +48,7 @@ class HomeController extends Controller
             ],
             'mobile' => '1'
         ];
-        $form->update(4, $data);*/
+        $form->update(4, $data);
 
         /*$form = new Form(new User);
         $form->text('name')->rules('required|max:10');

@@ -9,8 +9,6 @@ use Illuminate\Http\Request;
 class MenuController extends Controller
 {
 
-    use HasResourceActions;
-
     public function index(Request $request)
     {
         $adminMenu = new AdminMenu();

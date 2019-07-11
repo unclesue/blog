@@ -1,6 +1,9 @@
 <?php
 Route::middleware(['auth.admin'])->group(function () {
     Route::resource('menu', 'Admin\MenuController', ['except' => ['create']]);
+
+    Route::resource('articles', 'Admin\ArticleController');
+    Route::resource('users', 'Admin\UserController');
 });
 
 Route::get('login', 'Admin\LoginController@showLoginForm');
