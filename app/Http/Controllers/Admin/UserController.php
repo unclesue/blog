@@ -12,9 +12,9 @@ class UserController extends AdminController
     public function grid()
     {
         $model = new Model(new User);
-        $model->setPerPage(1);
+        $model->setPerPage(2);
+        $model->with('profile')->orderBy('id', 'DESC');
         print_r($model->buildData());die;
-
     }
 
     public function form()

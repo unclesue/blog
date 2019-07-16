@@ -4,6 +4,7 @@ namespace App\Http\Form;
 
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -72,6 +73,11 @@ class Model
      * @var Relation
      */
     protected $relation;
+
+    /**
+     * @var array
+     */
+    protected $eagerLoads = [];
 
 
     /**
@@ -209,6 +215,29 @@ class Model
     }
 
     /**
+     * @param callable $callback
+     * @param int      $count
+     *
+     * @return bool
+     */
+    public function chunk($callback, $count = 100)
+    {
+        if ($this->usePaginate) {
+            return $this->buildData(false)->chunk($count)->each($callback);
+        }
+
+        $this->setSort();
+
+        $this->queries->reject(function ($query) {
+            return $query['method'] == 'paginate';
+        })->each(function ($query) {
+            $this->model = $this->model->{$query['method']}(...$query['arguments']);
+        });
+
+        return $this->model->chunk($count, $callback);
+    }
+
+    /**
      * @throws \Exception
      *
      * @return Collection
@@ -257,7 +286,9 @@ class Model
                 $paginator->getPageName() => $paginator->lastPage(),
             ]);
 
-            redirect($lastPageUrl);
+            redirect($lastPageUrl)->send();
+
+            exit;
         }
     }
 
@@ -298,22 +329,8 @@ class Model
      */
     protected function resolvePerPage($paginate)
     {
-        if ($perPage = request($this->perPageName)) {
-            if (is_array($paginate)) {
-                $paginate['arguments'][0] = (int) $perPage;
-
-                return $paginate['arguments'];
-            }
-
-            $this->perPage = (int) $perPage;
-        }
-
         if (isset($paginate['arguments'][0])) {
             return $paginate['arguments'];
-        }
-
-        if ($name = $this->grid->getName()) {
-            return [$this->perPage, ['*'], "{$name}_page"];
         }
 
         return [$this->perPage];
@@ -458,6 +475,42 @@ class Model
         }
 
         throw new \Exception('Related sortable only support `HasOne` and `BelongsTo` relation.');
+    }
+
+    /**
+     * Set the relationships that should be eager loaded.
+     *
+     * @param mixed $relations
+     *
+     * @return $this|Model
+     */
+    public function with($relations)
+    {
+        if (is_array($relations)) {
+            if (Arr::isAssoc($relations)) {
+                $relations = array_keys($relations);
+            }
+
+            $this->eagerLoads = array_merge($this->eagerLoads, $relations);
+        }
+
+        if (is_string($relations)) {
+            if (Str::contains($relations, '.')) {
+                $relations = explode('.', $relations)[0];
+            }
+
+            if (Str::contains($relations, ':')) {
+                $relations = explode(':', $relations)[0];
+            }
+
+            if (in_array($relations, $this->eagerLoads)) {
+                return $this;
+            }
+
+            $this->eagerLoads[] = $relations;
+        }
+
+        return $this->__call('with', (array) $relations);
     }
 
     /**
