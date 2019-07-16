@@ -12,7 +12,7 @@ class AdminController
      */
     public function index()
     {
-        print_r($this->form()->model());
+        $this->grid();
 
         return $this->view();
     }
@@ -41,6 +41,11 @@ class AdminController
         return $this->view();
     }
 
+    /**
+     * 获取路由名称渲染页面
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function view()
     {
         $routeName = request()->route()->getName();

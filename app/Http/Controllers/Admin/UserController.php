@@ -2,12 +2,20 @@
 
 namespace App\Http\Controllers\Admin;
 
-
 use App\Http\Form\Form;
+use App\Http\Form\Model;
 use App\Model\User;
 
 class UserController extends AdminController
 {
+
+    public function grid()
+    {
+        $model = new Model(new User);
+        $model->setPerPage(1);
+        print_r($model->buildData());die;
+
+    }
 
     public function form()
     {
