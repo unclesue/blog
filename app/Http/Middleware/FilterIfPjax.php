@@ -16,9 +16,9 @@ class FilterIfPjax
     public function handle($request, Closure $next)
     {
         if ($request->pjax()) {
-            $request->query->set('layout', 'admin.content');
+            $request->attributes->set('layout', 'admin.content');
         } else {
-            $request->query->set('layout', 'admin.index');
+            $request->attributes->set('layout', 'admin.index');
         }
 
         return $next($request);

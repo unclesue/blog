@@ -1,4 +1,4 @@
-@extends(Request::instance()->layout)
+@extends(request()->get('layout'))
 
 @section('content')
     <!-- Content Header (Page header) -->

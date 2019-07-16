@@ -9,12 +9,14 @@ use App\Model\User;
 class UserController extends AdminController
 {
 
-    public function grid()
+    public function index()
     {
         $model = new Model(new User);
-        $model->setPerPage(2);
+        $model->setPerPage(20);
         $model->with('profile')->orderBy('id', 'DESC');
-        print_r($model->buildData());die;
+        $users = $model->buildData(false);
+
+        return $this->view(compact('users'));
     }
 
     public function form()
