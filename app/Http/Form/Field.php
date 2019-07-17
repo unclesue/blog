@@ -67,6 +67,13 @@ class Field
      */
     protected $original;
 
+    /**
+     * View for field to render.
+     *
+     * @var string
+     */
+    protected $view = '';
+
 
     /**
      * Field constructor.
@@ -251,6 +258,32 @@ class Field
         }
 
         return $rules;
+    }
+
+    /**
+     * Render this filed.
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     */
+    public function render()
+    {
+        return view($this->getView(), []);
+    }
+
+    /**
+     * Get view of this field.
+     *
+     * @return string
+     */
+    public function getView()
+    {
+        if (!empty($this->view)) {
+            return $this->view;
+        }
+
+        $class = explode('\\', get_called_class());
+
+        return 'admin.form.'.strtolower(end($class));
     }
 
 }

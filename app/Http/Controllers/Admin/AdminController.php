@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 
+use Collective\Html\FormFacade;
+
 class AdminController
 {
     use HasResourceActions;
@@ -33,9 +35,9 @@ class AdminController
      */
     public function edit($id)
     {
-        $this->form();
+        $form = $this->form();
 
-        return $this->detail($id);
+        return $this->view();
     }
 
     /**
@@ -45,7 +47,7 @@ class AdminController
     {
         $this->form();
 
-        return $this->detail();
+        return $this->view();
     }
 
     /**

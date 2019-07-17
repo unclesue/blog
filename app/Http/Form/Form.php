@@ -283,6 +283,26 @@ class Form
     }
 
     /**
+     * Build html of content.
+     *
+     * @return string
+     */
+    public function build()
+    {
+        ob_start();
+
+        foreach ($this->fields as $field) {
+            echo $field->render();
+        }
+
+        $contents = ob_get_contents();
+
+        ob_end_clean();
+
+        return $contents;
+    }
+
+    /**
      * Merge validation messages from input validators.
      *
      * @param \Illuminate\Validation\Validator[] $validators

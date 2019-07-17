@@ -23,14 +23,15 @@ class UserController extends AdminController
     {
         $user = User::findOrFail($id);
 
-        return $this->view(compact('user'));
+        return $this->view(compact('user', 'content'));
     }
 
     public function form()
     {
         $form = new Form(new User);
         $form->text('name')->rules('required|max:10');
-        $form->image('profile.avatar');
+        $form->text('email')->rules('required|max:10');
+        //$form->image('profile.avatar');
 
         return $form;
     }
