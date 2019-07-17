@@ -45,17 +45,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <body class="skin-blue sidebar-mini sidebar-collapse">
 <div class="wrapper">
 
-    @include('admin.partials.header')
+    {{--@include('admin.partials.header')
 
-    @include('admin.partials.sidebar')
+    @include('admin.partials.sidebar')--}}
 
-    <div class="content-wrapper" id="pjax-container">
+    <div class="content-wrapper" id="pjax-container" style="margin-left: 0px !important;">
         <div id="app">
             @yield('content')
         </div>
     </div>
 
-    @include('admin.partials.footer')
+    {{--@include('admin.partials.footer')--}}
 
 </div>
 <!-- ./wrapper -->

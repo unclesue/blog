@@ -9,7 +9,7 @@ use App\Model\User;
 class UserController extends AdminController
 {
 
-    public function index()
+    public function grid()
     {
         $model = new Model(new User);
         $model->setPerPage(20);
@@ -19,13 +19,18 @@ class UserController extends AdminController
         return $this->view(compact('users'));
     }
 
+    public function detail($id)
+    {
+        $user = User::findOrFail($id);
+
+        return $this->view(compact('user'));
+    }
+
     public function form()
     {
         $form = new Form(new User);
         $form->text('name')->rules('required|max:10');
-        $form->text('email')->rules('required|email');
-        $form->text('password')->rules('required|max:12');
-        $form->text('phone.mobile')->rules('required|unique:phones|min:11', ['mobile.min' => '{{id}}email must']);
+        $form->image('profile.avatar');
 
         return $form;
     }
