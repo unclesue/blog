@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Form;
 
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,7 +19,7 @@ use Illuminate\Support\Str;
  * @method File           file($column)
  * @method Image          image($column)
  */
-class Form
+class Form implements Renderable
 {
     /**
      * Eloquent model of the form.
@@ -33,6 +34,11 @@ class Form
      * @var array
      */
     protected $updates = [];
+
+    /**
+     * @var Builder
+     */
+    protected $builder;
 
     /**
      * Data for save to model's relations from input.
@@ -56,9 +62,11 @@ class Form
     public static $availableFields = [];
 
     /**
-     * @var Collection
+     * Ignored saving fields.
+     *
+     * @var array
      */
-    protected $fields;
+    protected $ignored = [];
 
     /**
      * @var bool
@@ -74,7 +82,7 @@ class Form
     {
         $this->model = $model;
 
-        $this->fields = new Collection();
+        $this->builder = new Builder($this);
 
         Form::registerBuiltinFields();
 
@@ -87,16 +95,6 @@ class Form
     public function model()
     {
         return $this->model;
-    }
-
-    /**
-     * Get fields of this builder.
-     *
-     * @return Collection
-     */
-    public function fields()
-    {
-        return $this->fields;
     }
 
     /**
@@ -184,7 +182,7 @@ class Form
         $failedValidators = [];
 
         /** @var Field $field */
-        foreach ($this->fields() as $field) {
+        foreach ($this->builder->fields() as $field) {
             if (!$validator = $field->getValidator($input)) {
                 continue;
             }
@@ -209,7 +207,7 @@ class Form
         $relations = $columns = [];
 
         /** @var Field $field */
-        foreach ($this->fields as $field) {
+        foreach ($this->builder->fields() as $field) {
             $columns[] = $field->column();
         }
 
@@ -259,7 +257,24 @@ class Form
     {
         $field->setForm($this);
 
-        $this->fields()->push($field);
+        $this->builder->fields()->push($field);
+
+        return $this;
+    }
+
+    /**
+     * Generate a edit form.
+     *
+     * @param $id
+     *
+     * @return $this
+     */
+    public function edit($id)
+    {
+        $this->builder->setMode(Builder::MODE_EDIT);
+        $this->builder->setResourceId($id);
+
+        $this->setFieldValue($id);
 
         return $this;
     }
@@ -280,6 +295,34 @@ class Form
         foreach ($map as $abstract => $class) {
             static::$availableFields[$abstract] = $class;
         }
+    }
+
+    /**
+     * Set all fields value in form.
+     *
+     * @param $id
+     *
+     * @return void
+     */
+    protected function setFieldValue($id)
+    {
+        $relations = $this->getRelations();
+
+        $builder = $this->model();
+
+        if ($this->isSoftDeletes) {
+            $builder = $builder->withTrashed();
+        }
+
+        $this->model = $builder->with($relations)->findOrFail($id);
+
+        $data = $this->model->toArray();
+
+        $this->builder->fields()->each(function (Field $field) use ($data) {
+            if (!in_array($field->column(), $this->ignored)) {
+                $field->fill($data);
+            }
+        });
     }
 
     /**
@@ -347,7 +390,7 @@ class Form
     {
         $values = $this->model->toArray();
 
-        $this->fields()->each(function (Field $field) use ($values) {
+        $this->builder->fields()->each(function (Field $field) use ($values) {
             $field->setOriginal($values);
         });
     }
@@ -482,7 +525,7 @@ class Form
         $prepared = [];
 
         /** @var Field $field */
-        foreach ($this->fields() as $field) {
+        foreach ($this->builder->fields() as $field) {
             $columns = $field->column();
 
             // If column not in input array data, then continue.
@@ -573,7 +616,7 @@ class Form
      */
     protected function getFieldByColumn($column)
     {
-        return $this->fields->first(
+        return $this->builder->fields()->first(
             function (Field $field) use ($column) {
                 return $field->column() == $column;
             }
@@ -682,4 +725,13 @@ class Form
         return new Nullable();
     }
 
+    /**
+     * Get the evaluated contents of the object.
+     *
+     * @return string
+     */
+    public function render()
+    {
+        return $this->builder->render();
+    }
 }

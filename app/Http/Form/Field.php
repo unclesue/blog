@@ -9,14 +9,22 @@
 namespace App\Http\Form;
 
 use Closure;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 
-class Field
+class Field implements Renderable
 {
     use Macroable;
 
     const FILE_DELETE_FLAG = '_file_del_';
+
+    /**
+     * Element value.
+     *
+     * @var mixed
+     */
+    protected $value;
 
     /**
      * Column name.
@@ -260,4 +268,82 @@ class Field
         return $rules;
     }
 
+    /**
+     * Set or get value of the field.
+     *
+     * @param null $value
+     *
+     * @return mixed
+     */
+    public function value($value = null)
+    {
+        if (is_null($value)) {
+            return is_null($this->value) ? '' : $this->value;
+        }
+
+        $this->value = $value;
+
+        return $this;
+    }
+
+    /**
+     * Fill data to the field.
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    public function fill($data)
+    {
+        $this->data = $data;
+
+        if (is_array($this->column)) {
+            foreach ($this->column as $key => $column) {
+                $this->value[$key] = Arr::get($data, $column);
+            }
+
+            return;
+        }
+
+        $this->value = Arr::get($data, $this->column);
+        if (isset($this->customFormat) && $this->customFormat instanceof \Closure) {
+            $this->value = call_user_func($this->customFormat, $this->value);
+        }
+    }
+
+    /**
+     * Get the view variables of this field.
+     *
+     * @return array
+     */
+    public function variables()
+    {
+        return [];
+    }
+
+    /**
+     * Get view of this field.
+     *
+     * @return string
+     */
+    public function getView()
+    {
+        if (!empty($this->view)) {
+            return $this->view;
+        }
+
+        $class = explode('\\', get_called_class());
+
+        return 'admin.form.'.strtolower(end($class));
+    }
+
+    /**
+     * Render this filed.
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     */
+    public function render()
+    {
+        return view($this->getView(), $this->variables());
+    }
 }

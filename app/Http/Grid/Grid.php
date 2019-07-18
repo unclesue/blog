@@ -149,7 +149,7 @@ class Grid
     public function render()
     {
         $this->build();
-print_r($this->rows->all());die;
+
         return view($this->view, $this->variables())->render();
     }
 

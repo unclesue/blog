@@ -62,14 +62,18 @@ class AdminController
 
     /**
      * Edit interface.
-     * @param $id
-     * @return mixed
+     *
+     * @param mixed   $id
+     * @param Content $content
+     *
+     * @return Content
      */
-    public function edit($id)
+    public function edit($id, Content $content)
     {
-        $form = $this->form();
-
-        return $this->view();
+        return $content
+            ->title($this->title())
+            ->description('edit')
+            ->body($this->form());
     }
 
     /**
