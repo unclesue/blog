@@ -3,19 +3,51 @@
 namespace App\Http\Controllers\Admin;
 
 
-use Collective\Html\FormFacade;
+use App\Http\Layout\Content;
 
 class AdminController
 {
     use HasResourceActions;
 
     /**
+     * Title for current resource.
+     *
+     * @var string
+     */
+    protected $title = 'Title';
+
+    /**
+     * Set description for following 4 action pages.
+     *
+     * @var array
+     */
+    protected $description = [
+//        'index'  => 'Index',
+//        'show'   => 'Show',
+//        'edit'   => 'Edit',
+//        'create' => 'Create',
+    ];
+
+    /**
+     * Get content title.
+     *
+     * @return string
+     */
+    protected function title()
+    {
+        return $this->title;
+    }
+
+    /**
      * Index interface.
      *
      */
-    public function index()
+    public function index(Content $content)
     {
-        return $this->grid();
+        return $content
+            ->title($this->title())
+            ->description('描述')
+            ->body($this->grid());
     }
 
     /**

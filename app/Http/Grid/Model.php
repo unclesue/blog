@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Form;
+namespace App\Http\Grid;
 
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Pagination\LengthAwarePaginator;

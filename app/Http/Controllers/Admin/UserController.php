@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Form\Form;
-use App\Http\Form\Model;
+use App\Http\Grid\Grid;
 use App\Model\User;
 
 class UserController extends AdminController
@@ -11,12 +11,11 @@ class UserController extends AdminController
 
     public function grid()
     {
-        $model = new Model(new User);
-        $model->setPerPage(20);
-        $model->with('profile')->orderBy('id', 'DESC');
-        $users = $model->buildData(false);
+        $grid = new Grid(new User());
+        $grid->id();
+        $grid->name();
 
-        return $this->view(compact('users'));
+        return $grid;
     }
 
     public function detail($id)

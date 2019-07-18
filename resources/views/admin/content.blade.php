@@ -1,5 +1,5 @@
 <div id="app">
-    @yield('content')
+    {!! $content !!}
 </div>
 @yield('header')
 @yield('footer')
