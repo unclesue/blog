@@ -12,7 +12,7 @@ class UserController extends AdminController
     public function grid()
     {
         $grid = new Grid(new User());
-        $grid->id();
+        $grid->id('ID');
         $grid->name();
 
         return $grid;

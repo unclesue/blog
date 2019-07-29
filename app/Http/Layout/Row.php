@@ -50,7 +50,8 @@ class Row implements Renderable
     /**
      * Add class in row.
      *
-     * @param array|string $class
+     * @param $class
+     * @return $this
      */
     public function class($class)
     {

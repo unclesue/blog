@@ -2,7 +2,6 @@
 
 namespace App\Http\Layout;
 
-use Closure;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Arr;
 
@@ -77,9 +76,9 @@ class Content implements Renderable
     /**
      * Set breadcrumb of content.
      *
-     * @param array ...$breadcrumb
-     *
+     * @param mixed ...$breadcrumb
      * @return $this
+     * @throws \Exception
      */
     public function breadcrumb(...$breadcrumb)
     {
@@ -131,28 +130,9 @@ class Content implements Renderable
      */
     public function row($content)
     {
-        if ($content instanceof Closure) {
-            $row = new Row();
-            call_user_func($content, $row);
-            $this->addRow($row);
-        } else {
-            $this->addRow(new Row($content));
-        }
+        $this->addRow(new Row($content));
 
         return $this;
-    }
-
-    /**
-     * Render giving view as content body.
-     *
-     * @param string $view
-     * @param array  $data
-     *
-     * @return Content
-     */
-    public function view($view, $data)
-    {
-        return $this->body(view($view, $data));
     }
 
     /**
@@ -188,7 +168,8 @@ class Content implements Renderable
     /**
      * Render this content.
      *
-     * @return string
+     * @return array|string
+     * @throws \Throwable
      */
     public function render()
     {

@@ -8,7 +8,8 @@ use Illuminate\Support\Collection;
 
 class Grid
 {
-    use Concerns\HasFilter;
+    use Concerns\HasFilter,
+        Concerns\CanHidesColumns;
 
     /**
      * The grid data model instance.
@@ -63,6 +64,13 @@ class Grid
      * @var array
      */
     protected $variables = [];
+
+    /**
+     * All column names of the grid.
+     *
+     * @var array
+     */
+    public $columnNames = [];
 
 
     /**
@@ -121,11 +129,37 @@ class Grid
      */
     public function build()
     {
+        if ($this->builded) {
+            return;
+        }
+
         $collection = $this->applyFilter(false);
 
         $data = $collection->toArray();
 
-        $this->rows->push($data);
+        $this->columns->map(function (Column $column) use (&$data) {
+            //$data = $column->fill($data);
+
+            $this->columnNames[] = $column->getName();
+        });
+
+        $this->buildRows($data);
+
+        $this->builded = true;
+    }
+
+    /**
+     * Build the grid rows.
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    protected function buildRows(array $data)
+    {
+        $this->rows = collect($data)->map(function ($model, $number) {
+            return new Row($number, $model);
+        });
     }
 
     /**
@@ -158,10 +192,17 @@ class Grid
      *
      * @param string $column
      * @param string $label
+     *
+     * @return Column
      */
     protected function addColumn($column = '', $label = '')
     {
-        $this->columns->put($column, $label);
+        $column = new Column($column, $label);
+        $column->setGrid($this);
+
+        return tap($column, function ($value) {
+            $this->columns->push($value);
+        });
     }
 
     /**
@@ -169,12 +210,23 @@ class Grid
      *
      * @param $method
      * @param $arguments
+     * @return Column
      */
     public function __call($method, $arguments)
     {
-        $label = $arguments ?? null;
+        $label = $arguments[0] ?? null;
 
-        $this->addColumn($method, $label);
+        return $this->addColumn($method, $label);
+    }
+
+    /**
+     * Set grid row callback function.
+     *
+     * @return Collection|null
+     */
+    public function rows()
+    {
+        return $this->rows;
     }
 
 }
