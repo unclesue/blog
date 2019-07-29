@@ -12,6 +12,7 @@ class UserController extends AdminController
     public function grid()
     {
         $grid = new Grid(new User());
+        $grid->paginate(10);
         $grid->id('ID');
         $grid->name();
 

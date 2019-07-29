@@ -2,8 +2,8 @@
 
 namespace App\Http\Grid\Concerns;
 
-
 use App\Http\Grid\Column;
+use Illuminate\Support\Collection;
 
 trait CanHidesColumns
 {

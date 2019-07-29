@@ -195,6 +195,30 @@ class Column
     }
 
     /**
+     * Set sort value.
+     *
+     * @param bool $sort
+     *
+     * @return Column
+     */
+    public function sort($sort)
+    {
+        $this->sortable = $sort;
+
+        return $this;
+    }
+
+    /**
+     * Mark this column as sortable.
+     *
+     * @return Column
+     */
+    public function sortable()
+    {
+        return $this->sort(true);
+    }
+
+    /**
      * Create the column sorter.
      *
      * @return string
@@ -243,4 +267,17 @@ class Column
         return isset($this->sort['column']) && $this->sort['column'] == $this->name;
     }
 
+    /**
+     * Add column to total-row.
+     *
+     * @param null $display
+     *
+     * @return $this
+     */
+    public function totalRow($display = null)
+    {
+        $this->grid->addTotalRow($this->name, $display);
+
+        return $this;
+    }
 }

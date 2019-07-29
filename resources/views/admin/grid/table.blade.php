@@ -20,3 +20,7 @@
     </tbody>
 
 </table>
+
+<div class="box-footer clearfix">
+    {!! $grid->paginator() !!}
+</div>

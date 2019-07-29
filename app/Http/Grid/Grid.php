@@ -123,6 +123,16 @@ class Grid
     }
 
     /**
+     * Get the grid paginator.
+     *
+     * @return mixed
+     */
+    public function paginator()
+    {
+        return new Tools\Paginator($this);
+    }
+
+    /**
      * Build the grid.
      *
      * @return void
