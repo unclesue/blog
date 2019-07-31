@@ -2,11 +2,7 @@
 
 namespace App\Http\Grid;
 
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 class Column
 {
@@ -30,13 +26,6 @@ class Column
     protected $label;
 
     /**
-     * Original value of column.
-     *
-     * @var mixed
-     */
-    protected $original;
-
-    /**
      * Is column sortable.
      *
      * @var bool
@@ -49,72 +38,6 @@ class Column
      * @var array
      */
     protected $sort;
-
-    /**
-     * Help message.
-     *
-     * @var string
-     */
-    protected $help = '';
-
-    /**
-     * Cast Name.
-     *
-     * @var array
-     */
-    protected $cast;
-
-    /**
-     * Attributes of column.
-     *
-     * @var array
-     */
-    protected $attributes = [];
-
-    /**
-     * Relation name.
-     *
-     * @var bool
-     */
-    protected $relation = false;
-
-    /**
-     * Relation column.
-     *
-     * @var string
-     */
-    protected $relationColumn;
-
-    /**
-     * Original grid data.
-     *
-     * @var Collection
-     */
-    protected static $originalGridModels;
-
-    /**
-     * @var []Closure
-     */
-    protected $displayCallbacks = [];
-
-    /**
-     * Displayers for grid column.
-     *
-     * @var array
-     */
-    public static $displayers = [];
-
-    /**
-     * Defined columns.
-     *
-     * @var array
-     */
-    public static $defined = [];
-
-    /**
-     * @var array
-     */
-    protected static $htmlAttributes = [];
 
     /**
      * @var Model
@@ -267,17 +190,4 @@ class Column
         return isset($this->sort['column']) && $this->sort['column'] == $this->name;
     }
 
-    /**
-     * Add column to total-row.
-     *
-     * @param null $display
-     *
-     * @return $this
-     */
-    public function totalRow($display = null)
-    {
-        $this->grid->addTotalRow($this->name, $display);
-
-        return $this;
-    }
 }

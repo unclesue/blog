@@ -14,7 +14,10 @@ class UserController extends AdminController
         $grid = new Grid(new User());
         $grid->paginate(10);
         $grid->id('ID');
+        $grid->model()->with('profile');
         $grid->name();
+        $grid->column('profile.homepage');
+        $grid->column('profile.avatar');
 
         return $grid;
     }

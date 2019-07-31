@@ -5,6 +5,8 @@ namespace App\Http\Grid;
 use Closure;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations;
 
 class Grid
 {
@@ -148,8 +150,6 @@ class Grid
         $data = $collection->toArray();
 
         $this->columns->map(function (Column $column) use (&$data) {
-            //$data = $column->fill($data);
-
             $this->columnNames[] = $column->getName();
         });
 
@@ -173,6 +173,20 @@ class Grid
     }
 
     /**
+     * Add variables to grid view.
+     *
+     * @param array $variables
+     *
+     * @return $this
+     */
+    public function with($variables = [])
+    {
+        $this->variables = $variables;
+
+        return $this;
+    }
+
+    /**
      * Get all variables will used in grid view.
      *
      * @return array
@@ -182,6 +196,21 @@ class Grid
         $this->variables['grid'] = $this;
 
         return $this->variables;
+    }
+
+    /**
+     * Set a view to render.
+     *
+     * @param string $view
+     * @param array  $variables
+     */
+    public function setView($view, $variables = [])
+    {
+        if (!empty($variables)) {
+            $this->with($variables);
+        }
+
+        $this->view = $view;
     }
 
     /**
@@ -195,6 +224,23 @@ class Grid
         $this->build();
 
         return view($this->view, $this->variables())->render();
+    }
+
+    /**
+     * Add a column to Grid.
+     *
+     * @param string $name
+     * @param string $label
+     *
+     * @return Column
+     */
+    public function column($name, $label = '')
+    {
+        if (Str::contains($name, '.')) {
+            return $this->addRelationColumn($name, $label);
+        }
+
+        return $this->__call($name, array_filter([$label]));
     }
 
     /**
@@ -213,6 +259,35 @@ class Grid
         return tap($column, function ($value) {
             $this->columns->push($value);
         });
+    }
+
+    /**
+     * Add a relation column to grid.
+     *
+     * @param string $name
+     * @param string $label
+     *
+     * @return $this|bool|Column
+     */
+    protected function addRelationColumn($name, $label = '')
+    {
+        list($relation, $column) = explode('.', $name);
+
+        $model = $this->model()->eloquent();
+
+        if (!method_exists($model, $relation) || !$model->{$relation}() instanceof Relations\Relation) {
+            /*$class = get_class($model);
+
+            info("Call to undefined relationship [{$relation}] on model [{$class}].");*/
+
+            return $this;
+        }
+
+        $name = Str::snake($relation).'.'.$column;
+
+        $this->model()->with($relation);
+
+        return $this->addColumn($name, $label);
     }
 
     /**
